@@ -1,0 +1,5 @@
+pip*
+__pycache__/
+.env
+Pipfile.lock
+test.py

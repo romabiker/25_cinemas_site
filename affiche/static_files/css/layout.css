@@ -1,0 +1,46 @@
+.navbar {
+    background-color: #000108;
+    height: 120px;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+  background-color: #877165;;
+}
+.footer {
+  position: absolute;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  padding-top: 20px;
+  height: 400px;
+  background-color: #000108;
+}
+
+.content {
+    min-height: 400px;
+}
+
+.api-info {
+    font-size: 24px;
+}
+
+.thumbnail {
+    background-color: #0a0305;
+    color: #7c7370;
+}
+
+a {
+    color: #701b20;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #b48d2f;
+    text-decoration: none;
+
+}

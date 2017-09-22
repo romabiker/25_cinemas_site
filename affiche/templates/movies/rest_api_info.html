@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3 col-md-8 col-lg-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 api-info">
+            <h1>Работа с API</h1>
+            <p>К названию домена добавить префикс "/api/movies"</p>
+            <p>Данные предоставляются в формате json</p>
+            <p><a href="{{ url_for('movies.list_top_rated') }}">Перейти на главную</a></p>
+        </div>
+    </div>
+{% endblock content %}
