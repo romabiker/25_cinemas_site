@@ -104,7 +104,7 @@ def produce_headers(user_agent):
 
 def parse_rating_and_link_from(kinopoisk_html):
     soup = BeautifulSoup(kinopoisk_html, 'html.parser')
-    return (extract_film_link(soup), extract_rating(soup))
+    return extract_film_link(soup), extract_rating(soup)
 
 
 def download_and_parse_film_ratings(title, proxy_ips, user_agents):
@@ -272,10 +272,10 @@ def find_popular_movies(pop_level, proxy_ips, user_agents):
 
 @cache.memoize(60*60*24)
 def fetch_top_movies_with_data(top_count=10, pop_level=30):
+    start = datetime.now()
     logging.info('Starting...')
     proxy_ips = fetch_proxy_ip_list()
     user_agents = make_useragents_list()
-    start = datetime.now()
     popular_movies = find_popular_movies(pop_level, proxy_ips, user_agents)
     logging.info('Start fetching movies info')
     films_kinopoisk_info = fetch_top_films_info_from_kinopoisk(popular_movies,
