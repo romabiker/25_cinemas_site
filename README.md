@@ -4,7 +4,7 @@
 Sometimes you want to know the coolest films that are going on at the moment, but when you go to the [afisha](https://www.afisha.ru/msk/schedule_cinema/) it is difficult to determine which of them has a higher rating at [kinopoisk](https://www.kinopoisk.ru)
 
 
-### [Affiche](https://fierce-tor-88650.herokuapp.com/)
+### [Affiche](https://infinite-cliffs-84583.herokuapp.com/)
 
 
 Quickstart
@@ -50,7 +50,7 @@ Register on Heroku
 Run the following commands:
 
 ```
-    Heroku login
+    heroku login
     git clone https://github.com/romabiker/25_cinemas_site.git
     cd 25_cinemas_site
     heroku create # creates application

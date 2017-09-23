@@ -1,1 +1,1 @@
-web: gunicorn autoapp:app --log-file -
+web: gunicorn autoapp:app --timeout 120

@@ -42,8 +42,8 @@ def download_kinopoisk_search_html(
         title,
         proxy_ips,
         user_agents,
-        min_delay=2,
-        max_delay=4,
+        min_delay=0,
+        max_delay=2,
         from_url='https://www.kinopoisk.ru/index.php',
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
@@ -65,8 +65,8 @@ def download_kinopoisk_film_html(
         link,
         proxy_ips,
         user_agents,
-        min_delay=2,
-        max_delay=5,
+        min_delay=0,
+        max_delay=2,
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
     rnd_header = produce_headers(get_random(user_agents))
