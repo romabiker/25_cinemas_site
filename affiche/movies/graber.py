@@ -180,7 +180,7 @@ def download_and_parse_film_info(link, proxy_ips, user_agents):
 def fetch_ratings_and_links(popular_movies,
                             proxy_ips,
                             user_agents,
-                            workers_number=6):
+                            workers_number=4):
     def run(tasks, results, proxy_ips, user_agents):
         while True:
             title = tasks.get()
@@ -206,7 +206,7 @@ def fetch_ratings_and_links(popular_movies,
     return list(results)
 
 
-def fetch_films_info(top_rated, proxy_ips, user_agents, workers_number=6):
+def fetch_films_info(top_rated, proxy_ips, user_agents, workers_number=4):
     def run(tasks, results, proxy_ips, user_agents):
         while True:
             link = tasks.get()
