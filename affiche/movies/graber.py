@@ -65,8 +65,8 @@ def download_kinopoisk_film_html(
         link,
         proxy_ips,
         user_agents,
-        min_delay=2,
-        max_delay=5,
+        min_delay=5,
+        max_delay=10,
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
     rnd_header = produce_headers(get_random(user_agents))
