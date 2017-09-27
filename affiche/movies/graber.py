@@ -42,8 +42,8 @@ def download_kinopoisk_search_html(
         title,
         proxy_ips,
         user_agents,
-        min_delay=2,
-        max_delay=5,
+        min_delay=5,
+        max_delay=12,
         from_url='https://www.kinopoisk.ru/index.php',
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
@@ -65,8 +65,8 @@ def download_kinopoisk_film_html(
         link,
         proxy_ips,
         user_agents,
-        min_delay=5,
-        max_delay=10,
+        min_delay=10,
+        max_delay=20,
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
     rnd_header = produce_headers(get_random(user_agents))
@@ -239,8 +239,6 @@ def fetch_top_films_info_from_kinopoisk(popular_movies,
     counter = Counter(dict(links_with_ratings))
     top_rated = counter.most_common(top_count)
     logging.info(top_rated)
-    fake_request = requests.get(
-        'https://www.kinopoisk.ru/afisha/new/city/2/sort_by/rating/#sort')
     return fetch_films_info(top_rated, proxy_ips, user_agents)
 
 
