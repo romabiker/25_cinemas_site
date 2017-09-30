@@ -90,7 +90,6 @@ def parse_id_and_rating_from(kinopoisk_search, film, top_count_res=2, first_el=0
     link_with_film_id = best_match_div.find('div', class_='info').p.a['href']
     film_kinopisk_id = re.findall(r'\d{5,7}', link_with_film_id)[first_el]
     film_kinopisk_rating = extract_kinopoisk_rating(best_match_div)
-
     return ((film, film_kinopisk_id, film_year, link_with_film_id),
             film_kinopisk_rating)
 
