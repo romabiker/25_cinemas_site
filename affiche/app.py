@@ -52,3 +52,4 @@ def register_errorhandlers(app):
 def register_commands(app):
     app.cli.add_command(commands.clean)
     app.cli.add_command(commands.key)
+    app.cli.add_command(commands.load)

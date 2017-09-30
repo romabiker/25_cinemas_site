@@ -4,11 +4,11 @@ verify_ssl = true
 
 [packages]
 flake8 = "*"
-flask = "*"
-flask-debugtoolbar = "*"
+Flask = "*"
+Flask-DebugToolbar = "*"
 isort = "*"
 beautifulsoup4 = "*"
 requests = "*"
 gunicorn = "*"
-flask-caching = "*"
-flask-restful = "*"
+Flask-Caching = "*"
+Flask-RESTful = "*"

@@ -4,7 +4,7 @@
 Sometimes you want to know the coolest films that are going on at the moment, but when you go to the [afisha](https://www.afisha.ru/msk/schedule_cinema/) it is difficult to determine which of them has a higher rating at [kinopoisk](https://www.kinopoisk.ru)
 
 
-### [Affiche](https://infinite-cliffs-84583.herokuapp.com/)
+### [Affiche](https://gentle-sands-68851.herokuapp.com/)
 
 
 Quickstart
