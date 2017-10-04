@@ -35,7 +35,7 @@ def register_api(app):
 
 
 def register_extensions(app):
-    debug_toolbar.init_app(app)
+    # debug_toolbar.init_app(app)
     cache.init_app(app)
     return None
 
