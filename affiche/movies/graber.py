@@ -91,7 +91,7 @@ def parse_id_and_rating_from(kinopoisk_search, film, top_count_res=2, first_el=0
     film_kinopisk_id = re.findall(r'\d{5,7}', link_with_film_id)[first_el]
     film_kinopisk_rating = extract_kinopoisk_rating(best_match_div)
     return ((film, film_kinopisk_id, film_year, link_with_film_id),
-            film_kinopisk_rating)
+             film_kinopisk_rating)
 
 
 def parse_afisha_film_page(film_html):
@@ -128,16 +128,20 @@ def download_kinopoisk_search_html(
         film,
         proxy_ips,
         user_agents,
+        min_delay=1,
+        max_delay=5,
         title=0,
         from_url='https://www.kinopoisk.ru/index.php',
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
     rnd_header = produce_headers(get_random(user_agents))
+    delay = random.choice(range(min_delay, max_delay))
+    time.sleep(delay)
     return requests.get(
         from_url,
-        params={'first': 'no',
-                'what': '',
-                'kp_query': film[title]},
+        params={'kp_query': film[title].encode('cp1251'),
+                'first': 'no',
+                'what': '',},
         headers=rnd_header,
         proxies=rnd_proxy,
     )
