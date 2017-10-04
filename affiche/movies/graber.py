@@ -40,6 +40,7 @@ def compose_proxy_url(from_ip):
         return {'http': 'http://{}'.format(from_ip),}
 
 
+@cache.memoize(60*60*24)
 def download_afisha_film_html(
         link,
         proxy_ips,
@@ -124,19 +125,20 @@ def download_and_parse_film_info_from_afisha(film, proxy_ips, user_agents):
         return full_movie_info
 
 
+@cache.memoize(60*60*24)
 def download_kinopoisk_search_html(
         film,
         proxy_ips,
         user_agents,
-        min_delay=1,
-        max_delay=5,
+        # min_delay=1,
+        # max_delay=5,
         title=0,
         from_url='https://www.kinopoisk.ru/index.php',
     ):
     rnd_proxy = compose_proxy_url(get_random(proxy_ips))
     rnd_header = produce_headers(get_random(user_agents))
-    delay = random.choice(range(min_delay, max_delay))
-    time.sleep(delay)
+    # delay = random.choice(range(min_delay, max_delay))
+    # time.sleep(delay)
     return requests.get(
         from_url,
         params={'kp_query': film[title].encode('cp1251'),
