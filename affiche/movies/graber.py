@@ -1,4 +1,4 @@
-from collections import deque, Counter
+from collections import deque, Counter, namedtuple
 from datetime import datetime
 from queue import Queue
 from threading import Thread
@@ -14,6 +14,19 @@ from flask.helpers import get_debug_flag
 
 
 from affiche.extensions import cache
+
+
+FilmInfo = namedtuple('FilmInfo', [
+        'title',
+        'afisha_link',
+        'kinopoisk_id',
+        'film_year',
+        'kinopoisk_link',
+        'kinopoisk_rating',
+        'film_genre',
+        'creation',
+        'description',
+    ])
 
 
 if get_debug_flag():
@@ -41,19 +54,12 @@ def compose_proxy_url(from_ip):
 
 
 @cache.memoize(60*60*24)
-def download_afisha_film_html(
+def download_afisha_film_html(link, proxy_ips, user_agents,):
+    return requests.get(
         link,
-        proxy_ips,
-        user_agents,
-        min_delay=0,
-        max_delay=1,
-    ):
-    rnd_proxy = compose_proxy_url(get_random(proxy_ips))
-    rnd_header = produce_headers(get_random(user_agents))
-    delay = random.choice(range(min_delay, max_delay))
-    logging.info('got delay {}'.format(delay))
-    time.sleep(delay)
-    return requests.get(link, headers=rnd_header, proxies=rnd_proxy,)
+        headers=produce_headers(get_random(user_agents)),
+        proxies=compose_proxy_url(get_random(proxy_ips)),
+    )
 
 
 
@@ -91,77 +97,88 @@ def parse_id_and_rating_from(kinopoisk_search, film, top_count_res=2, first_el=0
     link_with_film_id = best_match_div.find('div', class_='info').p.a['href']
     film_kinopisk_id = re.findall(r'\d{5,7}', link_with_film_id)[first_el]
     film_kinopisk_rating = extract_kinopoisk_rating(best_match_div)
-    return ((film, film_kinopisk_id, film_year, link_with_film_id),
-             film_kinopisk_rating)
+    return (FilmInfo(title=film['title'],
+                     afisha_link=film['afisha_link'],
+                     kinopoisk_id=film_kinopisk_id,
+                     film_year=film_year,
+                     kinopoisk_link=link_with_film_id,
+                     kinopoisk_rating=film_kinopisk_rating,
+                     film_genre='',
+                     creation='',
+                     description='',),
+            film_kinopisk_rating,
+    )
 
 
-def parse_afisha_film_page(film_html):
+def parse_afisha_film_page(film_html, film_info):
     soup = BeautifulSoup(film_html, 'html.parser')
     film_tag = soup.find('div', id='content')
-    return {
-        'film_genre': film_tag.find('div', class_='b-tags').text,
-        'creation':  film_tag.find('span', class_='creation').text,
-        'description': film_tag.find('p',
+    return film_info._replace(
+        film_genre = film_tag.find('div', class_='b-tags').text,
+        creation =  film_tag.find('span', class_='creation').text,
+        description = film_tag.find('p',
         id='ctl00_CenterPlaceHolder_ucMainPageContent_pEditorComments').text,
-     }
+    )
 
 
-def download_and_parse_film_info_from_afisha(film, proxy_ips, user_agents):
-    afisha_link = film[0][0][1]
-    response = download_afisha_film_html(afisha_link, proxy_ips, user_agents)
-    logging.info('{} : {}'.format(afisha_link, response.status_code))
+def download_and_parse_film_info_from_afisha(
+        film,
+        proxy_ips,
+        user_agents,
+        min_delay=0,
+        max_delay=1,
+        ):
+    film_info, kinopoisk_rating = film
+    delay = random.choice(range(min_delay, max_delay))
+    time.sleep(delay)
+    response = download_afisha_film_html(
+        film_info.afisha_link, proxy_ips, user_agents)
+    logging.info('{} : {}'.format(film_info.afisha_link, response.status_code))
     if response.ok:
-        film_info = parse_afisha_film_page(response.text)
-        full_movie_info = {
-            'title': film[0][0][0],
-            'kinopoisk_id': film[0][1],
-            'year': film[0][2],
-            'kinopoisk_link': film[0][3],
-            'kinopoisk_rating': film[1],
-            'afisha_link': afisha_link,
-        }
-        full_movie_info.update(film_info)
-        logging.info(full_movie_info)
-        return full_movie_info
+        film_info = parse_afisha_film_page(response.text, film_info)
+        logging.info(film_info)
+        return film_info
 
 
 @cache.memoize(60*60*24)
 def download_kinopoisk_search_html(
-        film,
+        film_title,
         proxy_ips,
         user_agents,
-        # min_delay=1,
-        # max_delay=5,
-        title=0,
         from_url='https://www.kinopoisk.ru/index.php',
     ):
-    rnd_proxy = compose_proxy_url(get_random(proxy_ips))
-    rnd_header = produce_headers(get_random(user_agents))
-    # delay = random.choice(range(min_delay, max_delay))
-    # time.sleep(delay)
     return requests.get(
         from_url,
-        params={'kp_query': film[title].encode('cp1251'),
+        params={'kp_query': film_title.encode('cp1251'),
                 'first': 'no',
                 'what': '',},
-        headers=rnd_header,
-        proxies=rnd_proxy,
+        headers=produce_headers(get_random(user_agents)),
+        proxies=compose_proxy_url(get_random(proxy_ips)),
     )
 
 
-def download_and_parse_ids_and_ratings(film, proxy_ips, user_agents):
-    response = download_kinopoisk_search_html(film, proxy_ips, user_agents)
+def download_and_parse_ids_and_ratings(
+        film,
+        proxy_ips,
+        user_agents,
+        min_delay=1,
+        max_delay=5,
+    ):
+    delay = random.choice(range(min_delay, max_delay))
+    time.sleep(delay)
+    response = download_kinopoisk_search_html(film['title'],
+                                              proxy_ips, user_agents)
     if response.ok:
         return parse_id_and_rating_from(response.text, film,)
 
 
 def grab_with_threads(popular_movies, proxy_ips, user_agents,
-                      grab, workers_number=4):
+                      graber_func, workers_number=4):
     def run(tasks, results, proxy_ips, user_agents):
         while True:
             film = tasks.get()
             logging.info('{film} was taken'.format(film=film))
-            results.append(grab(film, proxy_ips, user_agents))
+            results.append(graber_func(film, proxy_ips, user_agents))
             logging.info('{film} was done'.format(film=film))
             tasks.task_done()
     tasks = Queue()
@@ -183,20 +200,18 @@ def grab_with_threads(popular_movies, proxy_ips, user_agents,
 
 def fetch_ids_and_ratings_from_kinopoisk(popular_movies,
                                          proxy_ips, user_agents, top_count):
-    ids_with_ratings = grab_with_threads(popular_movies, proxy_ips, user_agents,
-                                       grab=download_and_parse_ids_and_ratings)
-    logging.info(ids_with_ratings)
-    return Counter(dict(ids_with_ratings)).most_common(top_count)
+    popular_movies = grab_with_threads(popular_movies, proxy_ips, user_agents,
+                                    graber_func=download_and_parse_ids_and_ratings)
+    logging.info(popular_movies)
+    return Counter(dict(popular_movies)).most_common(top_count)
 
 
 def download_afisha_schedule_cinema_page(proxy_ips, user_agents,
         afisha_cinema_url='https://www.afisha.ru/msk/schedule_cinema/'):
-    rnd_proxy = compose_proxy_url(get_random(proxy_ips))
-    rnd_header = produce_headers(get_random(user_agents))
     response = requests.get(
         afisha_cinema_url,
-        headers=rnd_header,
-        proxies=rnd_proxy,
+        headers=produce_headers(get_random(user_agents)),
+        proxies=compose_proxy_url(get_random(proxy_ips)),
     )
     if not response.ok:
         response.raise_for_status()
@@ -217,9 +232,11 @@ def find_afisha_popular_movies(pop_level, proxy_ips, user_agents):
     for film_div in film_tags:
         cinemas_quantity = len(film_div.find_next('table').find_all('tr'))
         if is_popular_by(cinemas_quantity, pop_level):
-            film_title = film_div.a.text
-            film_afisha_link = film_div.a['href']
-            popular_movies.append((film_title, film_afisha_link))
+            title = film_div.a.text
+            afisha_link = film_div.a['href']
+            popular_movies.append(
+                dict(title=title,
+                     afisha_link=afisha_link))
     logging.info(popular_movies)
     return popular_movies
 
@@ -227,15 +244,14 @@ def find_afisha_popular_movies(pop_level, proxy_ips, user_agents):
 @cache.memoize(60*60*24)
 def fetch_top_movies_with_data(top_count=10, pop_level=30):
     start = datetime.now()
-    logging.info('Starting...')
+    logging.info('Starting fetch_top_movies_with_data...')
     proxy_ips = fetch_proxy_ip_list()
     user_agents = make_useragents_list()
     popular_movies = find_afisha_popular_movies(pop_level, proxy_ips,
                                                 user_agents,)
-    films_kinopoisk_ids_and_ratings = fetch_ids_and_ratings_from_kinopoisk(
+    popular_movies = fetch_ids_and_ratings_from_kinopoisk(
                             popular_movies, proxy_ips, user_agents, top_count,)
-    films_full_info = grab_with_threads(films_kinopoisk_ids_and_ratings,
-                            proxy_ips, user_agents,
-                            grab=download_and_parse_film_info_from_afisha,)
+    movies_full_info = grab_with_threads(popular_movies, proxy_ips, user_agents,
+                        graber_func=download_and_parse_film_info_from_afisha,)
     logging.info('Total time: {}'.format(datetime.now() - start))
-    return films_full_info
+    return movies_full_info

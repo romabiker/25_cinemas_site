@@ -2,3 +2,4 @@ pip*
 __pycache__/
 .env
 graber_v2.py
+test.py

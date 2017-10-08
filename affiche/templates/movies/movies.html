@@ -9,10 +9,10 @@
                   <img src="https://st.kp.yandex.net/images/film_iphone/iphone360_{{ movie.kinopoisk_id }}.jpg" alt="{{ movie.title }}">
                   <div class="caption">
                     <h3><a href="https://www.kinopoisk.ru{{ movie.kinopoisk_link }}">{{ movie.title }}</a></h3>
-                    <p>рейтинг на кинопоиске: <strong>{{ movie.get('kinopoisk_rating') }}</strong></p>
-                    <p>{{ movie.get('film_genre') }}</p>
-                    <p>{{ movie.get('creation') }}</p>
-                    <p>{{ movie.get('description') }}</p>
+                    <p>рейтинг на кинопоиске: <strong>{{ movie.kinopoisk_rating }}</strong></p>
+                    <p>{{ movie.film_genre }}</p>
+                    <p>{{ movie.creation }}</p>
+                    <p>{{ movie.description }}</p>
                     <p><a href="https://www.kinopoisk.ru{{ movie.kinopoisk_link }}">Перейти на кинопоиск</a></p>
                     <p><a href="{{ movie.afisha_link }}">Перейти на афишу</a></p>
                   </div>
