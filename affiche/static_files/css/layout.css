@@ -44,3 +44,8 @@ a:hover {
     text-decoration: none;
 
 }
+
+.movie-img {
+  max-height: 540px;
+  max-width: 360px;
+}
