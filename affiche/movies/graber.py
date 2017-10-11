@@ -91,8 +91,8 @@ def extract_kinopoisk_rating(soup, default_rating='0'):
 def parse_id_and_rating_from(kinopoisk_search, film, top_count_res=2, first_el=0):
     soup = BeautifulSoup(kinopoisk_search, 'html.parser')
     top_search_results = soup.find_all('div', class_='element')[:top_count_res]
-    best_match_variants = Counter(dict(((result, find_year_in(result))
-                                         for result in top_search_results)))
+    best_match_variants = Counter(dict(((search_result, find_year_in(search_result))
+                                         for search_result in top_search_results)))
     best_match_div, film_year = best_match_variants.most_common()[first_el]
     link_with_film_id = best_match_div.find('div', class_='info').p.a['href']
     film_kinopisk_id = re.findall(r'\d{5,7}', link_with_film_id)[first_el]
