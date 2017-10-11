@@ -29,7 +29,7 @@ def key():
 
 @click.command()
 @click.option('-u', '--url', help='url to load')
-def load(url, path='test.html'):
+def load_page(url, path='test.html'):
     response = requests.get(url=url)
     response.raise_for_status()
     with open(path, 'w') as file_handler:
